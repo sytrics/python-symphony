@@ -74,7 +74,7 @@ class Lexer:
     def __init__(self):
         self.tokens = []
 
-    # inputText = open("testFile.c").readlines()
+    inputText = open("test.py").readlines()
     def lex(self, inputText):
 
         lineNumber = 0
@@ -86,6 +86,8 @@ class Lexer:
                 for tokenRegex in regexExpressions:
                     pattern, tag = tokenRegex
                     regex = re.compile(pattern)
+                    # re.search()
+                    
                     match = regex.match(line, position)
                     if match:
                         data = match.group(0)
