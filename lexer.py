@@ -1,105 +1,69 @@
 import re
 import sys
-from token import Token
+
+class Token() :
+    def __init__(self, type, valeur, ligne, position):
+        self.type = type
+        self.valeur = valeur
+        self.ligne = ligne
+        self.position = position
+
+    def __str__(self):
+        return "\nTOKEN FOUND \n type:" + str(self.type) + "\n valeur:" + str(self.valeur) + "\n position: ligne " + str(self.ligne) + " position " + str(self.position[0])
 
 regexExpressions = [
-    (r'[ \n\t]+', None),
-    (r'#[^\n]*', None),
-    (r'for\b', 'FOR'),
-    (r'if\b', 'IF'),
-    (r'else\b', 'ELSE'),
-    (r'break\b', 'BREAK'),
-    (r'while\b', 'WHILE'),
-    (r'return\b', 'RETURN'),
-    (r'struct\b', 'STRUCT'),
-    (r'typedef\b', 'TYPEDEF'),
-    (r'sizeof\b', 'SIZEOF'),
-    (r'switch\b', 'SWITCH'),
-    (r'case\b', 'CASE'),
-    (r'default\b', 'DEFAULT'),
-    (r'do\b', 'DO'),
-    (r'void\b', 'VOID'),
-    (r'goto\b', 'GOTO'),
-    (r'int\b', 'INT'),
-    (r'char\b', 'CHAR'),
-    (r'short\b', 'SHORT'),
-    (r'long\b', 'LONG'),
-    (r'float\b', 'FLOAT'),
-    (r'double\b', 'DOUBLE'),
-    (r'signed\b', 'SIGNED'),
-    (r'unsigned\b', 'UNSIGNED'),
-    (r'\(', 'LPAREN'),
-    (r'\)', 'RPAREN'),
-    (r'\{', 'LBRACE'),
-    (r'\}', 'RBRACE'),
-    (r'\[', 'LBRACKET'),
-    (r'\]', 'RBRACKET'),
-    (r'\;', 'SEMICOLON'),
-    (r'\:', 'COLON'),
-    (r'\,', 'COMMA'),
-    (r'\/\*', 'LCOMMENT'),
-    (r'\*\/', 'RCOMMENT'),
-    (r'\/\/(.*)', 'COMMENT'),
-    (r'\.', 'DOT'),
-    (r'\=\=', 'EQ'),
-    (r'\=', 'ASSIGN'),
-    (r'\+\+', 'ADDADD'),
-    (r'\+\=', 'ADDEQ'),
-    (r'\+', 'ADD'),
-    (r'\-\-', 'SUBSUB'),
-    (r'\-\=', 'SUBEQ'),
-    (r'\-', 'SUB'),
-    (r'\*', 'MUL'),
-    (r'\/', 'DIV'),
-    (r'\!\=', 'NEQ'),
-    (r'\|\|', 'DBAR'),
-    (r'\<', 'LT'),
-    (r'\<\=', 'LTE'),
-    (r'\>', 'GT'),
-    (r'\>\=', 'GTE'),
-    (r'\&', 'AMPERSAND'),
-    (r'\&\&', 'DAMPERSAND'),
-    (r'\#', 'SHARP'),
-    (r'[a-zA-Z]\w*', 'IDENTIFIER'),
-    (r'\d+\.\d+', 'FLOAT_LIT'),
-    (r'\d+', 'INTEGER_LIT'),
-    (r'\"[^\"]*\"', 'STRING_LIT'),
-    (r'\'[^\"]*\'', 'CHAR_LIT'),
-    (r'\w+(\.\w+)+', 'SELECTED_NAME')
-]
+
+    (r"\b(for)\b", 'FOR'),
+    (r"\b(if)\b", 'IF'),
+    (r"\b(else)\b", 'ELSE'),
+    (r"\b(while)\b", 'WHILE'),
+    (r"\b(return)\b", 'RETURN'),
+    (r"\#", 'COMMENT'),
+    (r"\w+", 'STRING'),
+    (r"\=", 'EQ'),
+    (r"\+", 'ADD'),
+    (r"\-", 'SUB'),
+    (r"\*", 'MUL'),
+    (r"\/", 'DIV'),
+    (r"\!", 'DIFF'),
+    (r"\|", 'BAR'),
+    (r"\<", 'INF'),
+    (r"\>", 'SUP'),
+    (r"\(", 'LPAREN'),
+    (r"\)", 'RPAREN'),
+    (r"\{", 'LBRACE'),
+    (r"\}", 'RBRACE'),
+    (r"\[", 'LBRACKET'),
+    (r"\]", 'RBRACKET'),
+    (r"\;", 'SEMICOLON'),
+    (r"\:", 'COLON'),
+    (r"\,", 'COMMA'),
+    (r"[+-]?[0-9]+(.[0-9]+)?", 'INT'),
+    (r"\n", 'EOL')
+    ]
 
 
-class Lexer:
+def Lexer(file) :
+    """
+    Lexing python source file and extracting tokens from it
+    :param file: file stream from readlines()
+    :return: list of Tokens found in file
+    """
 
-    def __init__(self):
-        self.tokens = []
+    Tokens = []
+    lineNumber = 1
+    for line in file:
+        for regex in regexExpressions:
+                kind, description = regex
+                match = re.search(kind, line)
+                if match :
+                    token = Token(description, match.group(),lineNumber, match.span())
+                    Tokens.append(token)
+                    print(token)
 
-    inputText = open("test.py").readlines()
-    def lex(self, inputText):
+        lineNumber +=1
 
-        lineNumber = 0
-        for line in inputText:
-            lineNumber += 1
-            position = 0
-            while position < len(line):
-                match = None
-                for tokenRegex in regexExpressions:
-                    pattern, tag = tokenRegex
-                    regex = re.compile(pattern)
-                    # re.search()
-                    
-                    match = regex.match(line, position)
-                    if match:
-                        data = match.group(0)
-                        if tag:
-                            token = Token(tag, data, [lineNumber, position])
-                            self.tokens.append(token)
-                        break
-                if not match:
-                    print(inputText[position])
-                    print("no match")
-                    sys.exit(1)
-                else:
-                    position = match.end(0)
-        print("lexer: analysis successful!")
-        return self.tokens
+    return Tokens
+
+inputText = open("test.py").readlines()
+Tokens  = Lexer(inputText)
