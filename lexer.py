@@ -1,7 +1,5 @@
 import re
 import sys
-
-
 from operator import itemgetter, attrgetter
 
 class Token() :
@@ -14,7 +12,7 @@ class Token() :
 
     def __str__(self):
         return "\nTOKEN FOUND \n type:" + str(self.type) + "\n valeur:" + str(self.valeur) + "\n position: ligne " + str(self.ligne) + " position " + str(self.position_debut)
->>>>>>> Stashed changes
+
 
 regexExpressions = [
     
@@ -25,7 +23,7 @@ regexExpressions = [
     (r"\b(return)\b", 'RETURN'),
     (r"\b(in)\b", 'IN'),
     (r"\b(range)\b", 'RANGE'),
-    (r"\b(\w+)\b", 'STRING'),
+    (r"\b(\w)+\b", 'STRING'),
     (r"\#", 'COMMENT'),
     (r"\=", 'EQ'),
     (r"\+", 'ADD'),
@@ -64,18 +62,20 @@ def Lexer(file) :
         positions = []
         for regex in regexExpressions:
                 kind, description = regex
-                match = re.search(kind, line)
-                if match :
-                    token = Token(description, match.group(),lineNumber, match.span())
-                    if match.span() not in positions : 
+                matchlist = re.finditer(kind, line)
+                for match in matchlist : 
+                    if match and (match.span() not in positions) :
+                        token = Token(description, match.group(),lineNumber, match.span())
                         Tokens.append(token)
-                        positions.append(match.span())
-                        
 
+                        positions.append(match.span())
+                
         lineNumber +=1
     # then we sort the tokens by begining position using sorted()
     tsorted = sorted(Tokens, key=attrgetter('ligne','position_debut'))
     return tsorted
+
+
 
 def FileReWritting(file) : 
     """
