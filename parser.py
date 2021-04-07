@@ -10,7 +10,7 @@ class Parser:
     MUL_OP = ['MUL', 'DIV']
     LITERAL = ['INTEGER_LIT', 'FLOAT_LIT', 'CHAR_LIT']
 
-    def __init__(self, verbose=False):
+    def __init__(self, verbose=False):  
         self.indentator = Indent(verbose)
         self.tokens = []
         self.errors = 0
