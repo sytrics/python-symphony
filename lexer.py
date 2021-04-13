@@ -15,7 +15,7 @@ class Token() :
 
 
 regexExpressions = [
-    
+    (r"\s", 'TAB'),
     (r"\b(for)\b", 'FOR'),
     (r"\b(if)\b", 'IF'),
     (r"\b(else)\b", 'ELSE'),
@@ -23,7 +23,7 @@ regexExpressions = [
     (r"\b(return)\b", 'RETURN'),
     (r"\b(in)\b", 'IN'),
     (r"\b(range)\b", 'RANGE'),
-    (r"\b(\w)+\b", 'STRING'),
+    (r"\b(\w)+\b", 'IDENTIFIER'),
     (r"\#", 'COMMENT'),
     (r"\=", 'EQ'),
     (r"\+", 'ADD'),
