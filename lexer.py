@@ -3,7 +3,7 @@ import sys
 from operator import itemgetter, attrgetter
 
 class Token() :
-    def __init__(self, type, valeur, ligne, position = (0,0)):
+    def __init__(self, type, valeur, ligne = 0, position = (0,0)):
         self.type = type
         self.valeur = valeur
         self.ligne = ligne
@@ -15,7 +15,7 @@ class Token() :
 
 
 regexExpressions = [
-    (r"\s\s\s\s", 'TAB'),
+    #(r"\s\s\s\s", 'TAB'),
     (r"\b(for)\b", 'FOR'),
     (r"\b(if)\b", 'IF'),
     (r"\b(else)\b", 'ELSE'),

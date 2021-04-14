@@ -2,19 +2,22 @@ import sys
 import lexer
 from Node import Node
 
-
+# TODO : expect Indent for if while statements 
+# TODO : In range and Is smthg 
+# TODO : Display AST 
 class Parser:
 
     ADD_OP = ['ADD', 'SUB']
     REL_OP = ['EQ', 'NEQ', 'INF', 'INFEQ', 'SUP', 'SUPEQ']
     TERM_OP = ['MULT', 'DIV']
+    FACTOR_TYPE = ['INT', 'FLOAT']
 
 
-    def __init__(self):  
-        self.tokens = []
+    def __init__(self, tokens):  
+        self.tokens = tokens
         self.errors = 0
         self.indent = []
-        self.AST = [] #list of nodes to build AST 
+        
         
 
     def show_next(self, n=1):
@@ -28,7 +31,7 @@ class Parser:
         actualToken = self.show_next()
         actualKind = actualToken.kind
         actualPosition = actualToken.position
-        if isinstance(kind, 'STRING') : 
+        if isinstance(kind, str) : 
             if actualKind == kind:
                 return self.accept_it()
             else:
@@ -46,26 +49,8 @@ class Parser:
         # output = str(token.kind) + ' ' + token.value
         return self.tokens.pop(0)
 
-    def parse_program(self):
-        for token in self.tokens :
-            if token.type == 'TAB' :
-                self.indent[token.ligne()-1] += 1
-                self.expect('TAB') #pop out of tokens 
-                continue
-            if token.type == 'IDENTIFIER' : 
-                self.expect("IDENTIFIER")
-                if self.show_next().type == 'EOL' : 
-                    #new line
-                    pass
-            
-
-        self.expect('RBRACE')
-        if (self.errors == 1):
-            print('WARNING: 1 error found!')
-        elif (self.errors > 1):
-            print('WARNING: ' + str(self.errors) + ' errors found!')
-        else:
-            print('parser: syntax analysis successful!')
+    
+   
 
     
         
@@ -74,16 +59,15 @@ class Parser:
         factor = IDENTIFIER | NUMBER | "(" expression ")"
         .
         """
-        if self.show_next().type == 'IDENTIFIER' :
-            self.expect('IDENTIFIER')
+        retour = []
+        if self.show_next().type in Parser.FACTOR_TYPE :
+            retour.append(Node(self.accept_it()))
             pass
-        elif self.show_next().type == 'INT':
-            self.expect('INT')
-            pass
+       
         elif self.show_next().type == 'LPAREN':
-            self.expect('LPAREN')
-            self.expression()
-            self.expect('RPAREN')
+            retour.append(Node(self.accept_it()))
+            retour.append(self.expression())
+            retour.append(Node(self.expect('RPAREN')))
         else:
             print("factor: syntax error")
             
@@ -92,26 +76,37 @@ class Parser:
     def term(self):
         """
         term = factor {("*"|"/") factor}
-        .
+        
         """
         retour = []
-        self.factor()
+        retour.append(self.factor())
         while self.show_next().type in Parser.TERM_OP:
             retour.append(Node(self.accept_it()))
-            self.factor()
+            retour.append(self.factor())
+        
+        n = Node()
+        for e in retour:
+            n.addNode(e)
+        return n
 
     #--------------------------------------------------
     def expression(self):
         """
         expression = ["+"|"-"] term {("+"|"-") term}
-        .
+        
         """
         retour = []
         if self.show_next().type in Parser.ADD_OP:
-            retour.append(Node(self.expect(Parser.ADD_OP)))
-        self.term()
+            retour.append(Node(self.accept_it()))
+        retour.append(self.term())
         while self.show_next().type in Parser.ADD_OP:
-            self.term()
+            retour.append(Node(self.accept_it()))
+            retour.append(self.term())
+
+        n = Node()
+        for e in retour:
+            n.addNode(e)
+        return n
 
     #--------------------------------------------------
     def condition(self):
@@ -126,7 +121,7 @@ class Parser:
         retour = []
         self.expression()
         if (self.show_next().type in Parser.REL_OP):
-            retour.append(Node(self.expect(Parser.REL_OP)))
+            retour.append(Node(self.accept_it()))
             retour.append(self.expression())
         elif self.show_next().type == 'IN' : 
             pass 
@@ -135,7 +130,7 @@ class Parser:
             pass 
             #TODO : is smthg 
         else :
-            print("condition: found invalid operator line" + str(self.show_next().ligne))
+            print("condition: found invalid operator ")
             sys.exit(1) 
         
         n = Node()
@@ -152,11 +147,10 @@ class Parser:
             | "if" condition "then" statement
             | "while" condition "do" statement
             ]
-        .
         """
         retour = []
         if self.show_next().type == 'IDENTIFIER':
-            retour.append(Node(self.expect('IDENTIFIER')))
+            retour.append(Node(self.accept_it))
             retour.append(Node(self.expect('EQ')))
             retour.append(self.expression())
 
@@ -164,7 +158,7 @@ class Parser:
         elif self.show_next().type == 'IF':
             retour.append(self.condition())
             retour.append(Node(self.expect('COLON')))
-            # tant qu'on est au meme niveau d'indent
+        
             retour.append(self.statement())
             #ajouter else elseif
 
@@ -173,6 +167,7 @@ class Parser:
             retour.append(Node(self.expect('COLON')))
             retour.append(self.statement())
 
+        
         n = Node()
         for e in retour:
             n.addNode(e)
@@ -186,5 +181,6 @@ class Parser:
         AST = Node()
         while len(self.tokens) > 0 : 
             AST.addNode(self.statement())
+        print("success : program is compiled")
         return AST
 
