@@ -3,7 +3,7 @@ import sys
 from operator import itemgetter, attrgetter
 
 class Token() :
-    def __init__(self, type, valeur, ligne, position):
+    def __init__(self, type, valeur, ligne, position = (0,0)):
         self.type = type
         self.valeur = valeur
         self.ligne = ligne
@@ -11,11 +11,11 @@ class Token() :
         self.position_fin = position[1]
 
     def __str__(self):
-        return "\nTOKEN FOUND \n type:" + str(self.type) + "\n valeur:" + str(self.valeur) + "\n position: ligne " + str(self.ligne) + " position " + str(self.position_debut)
+        return "\n type:" + str(self.type) + "\n valeur:" + str(self.valeur) + "\n position: ligne " + str(self.ligne) + " position " + str(self.position_debut)
 
 
 regexExpressions = [
-    (r"\s", 'TAB'),
+    (r"\s\s\s\s", 'TAB'),
     (r"\b(for)\b", 'FOR'),
     (r"\b(if)\b", 'IF'),
     (r"\b(else)\b", 'ELSE'),
@@ -26,14 +26,18 @@ regexExpressions = [
     (r"\b(\w)+\b", 'IDENTIFIER'),
     (r"\#", 'COMMENT'),
     (r"\=", 'EQ'),
+    (r"\=", 'ASSIGN'),
     (r"\+", 'ADD'),
     (r"\-", 'SUB'),
     (r"\*", 'MUL'),
     (r"\/", 'DIV'),
     (r"\!", 'DIFF'),
+    (r"\!\=", 'NEQ'),
     (r"\|", 'BAR'),
     (r"\<", 'INF'),
+    (r"\<\=", 'INFEQ'),
     (r"\>", 'SUP'),
+    (r"\>\=", 'SUPEQ'),
     (r"\(", 'LPAREN'),
     (r"\)", 'RPAREN'),
     (r"\{", 'LBRACE'),
@@ -45,7 +49,7 @@ regexExpressions = [
     (r"\,", 'COMMA'),
     (r"[+-]?[0-9]+(.[0-9]+)", 'FLOAT'),
     (r"[+-]?[0-9]+", 'INT'),
-    (r"\n", 'EOL')
+    # (r"\n", 'EOL')
     ]
 
 
@@ -79,6 +83,7 @@ def Lexer(file) :
 
 def FileReWritting(file) : 
     """
+    For it to work , you need to add the regex for EOL (commented)
     copies initial file then ret-writes it using tokens 
     :param file: file string stream from readlines 
     """
@@ -101,5 +106,5 @@ def tokenPrint(Tokens) :
 inputText = open("test.py").readlines()
 Tokens  = Lexer(inputText)
 tokenPrint(Tokens)
-FileReWritting(inputText)
+# FileReWritting(inputText)
 
