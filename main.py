@@ -1,7 +1,7 @@
 import sys
 import argparse
 import lexer
-from lexer import Lexer
+from lexer import Lexer, tokenPrint
 from parser_AST import Parser
 
 
@@ -34,3 +34,4 @@ if __name__ == '__main__':
     Tokens  = Lexer(inputText)
     parser = Parser(Tokens)
     parser.parse()
+    tokenPrint(parser.tokens)

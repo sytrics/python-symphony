@@ -15,3 +15,13 @@ class Node:
         """
         self.children.append(node)
         
+    def toString(self, node):
+        """
+        displaying node tree (ast if the node is root)
+        """
+
+    def __str__(self) : 
+        
+        print("node")
+        print(len(self.children))
+        

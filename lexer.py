@@ -23,7 +23,6 @@ regexExpressions = [
     (r"\b(return)\b", 'RETURN'),
     (r"\b(in)\b", 'IN'),
     (r"\b(range)\b", 'RANGE'),
-    (r"\b(\w)+\b", 'IDENTIFIER'),
     (r"\#", 'COMMENT'),
     (r"\=", 'EQ'),
     (r"\=", 'ASSIGN'),
@@ -49,6 +48,7 @@ regexExpressions = [
     (r"\,", 'COMMA'),
     (r"[+-]?[0-9]+(.[0-9]+)", 'FLOAT'),
     (r"[+-]?[0-9]+", 'INT'),
+    (r"\b(\w)+\b", 'IDENTIFIER'),
     # (r"\n", 'EOL')
     ]
 

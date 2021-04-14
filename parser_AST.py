@@ -14,7 +14,7 @@ class Parser:
 
 
     def __init__(self, tokens):  
-        self.tokens = tokens
+        self.tokens = tokens[:]
         self.errors = 0
         self.indent = []
         
@@ -29,8 +29,8 @@ class Parser:
 
     def expect(self, kind):
         actualToken = self.show_next()
-        actualKind = actualToken.kind
-        actualPosition = actualToken.position
+        actualKind = actualToken.type
+        actualPosition = (actualToken.ligne, actualToken.position_debut,actualToken.position_fin)
         if isinstance(kind, str) : 
             if actualKind == kind:
                 return self.accept_it()
@@ -59,6 +59,7 @@ class Parser:
         factor = IDENTIFIER | NUMBER | "(" expression ")"
         .
         """
+        print("factor")
         retour = []
         if self.show_next().type in Parser.FACTOR_TYPE :
             retour.append(Node(self.accept_it()))
@@ -78,9 +79,11 @@ class Parser:
         term = factor {("*"|"/") factor}
         
         """
+        print("term")
         retour = []
         retour.append(self.factor())
         while self.show_next().type in Parser.TERM_OP:
+            print("enter while")
             retour.append(Node(self.accept_it()))
             retour.append(self.factor())
         
@@ -95,6 +98,7 @@ class Parser:
         expression = ["+"|"-"] term {("+"|"-") term}
         
         """
+        print("expression")
         retour = []
         if self.show_next().type in Parser.ADD_OP:
             retour.append(Node(self.accept_it()))
@@ -118,6 +122,7 @@ class Parser:
             | in ... 
         .
         """
+        print("condition")
         retour = []
         self.expression()
         if (self.show_next().type in Parser.REL_OP):
@@ -148,9 +153,10 @@ class Parser:
             | "while" condition "do" statement
             ]
         """
+        print("statement")
         retour = []
         if self.show_next().type == 'IDENTIFIER':
-            retour.append(Node(self.accept_it))
+            retour.append(Node(self.accept_it()))
             retour.append(Node(self.expect('EQ')))
             retour.append(self.expression())
 
@@ -181,6 +187,7 @@ class Parser:
         AST = Node()
         while len(self.tokens) > 0 : 
             AST.addNode(self.statement())
+            print(self.show_next())
         print("success : program is compiled")
         return AST
 
