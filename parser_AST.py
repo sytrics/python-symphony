@@ -3,6 +3,7 @@ import lexer
 from Node import Node
 
 # TODO : expect Indent for if while statements 
+# TODO : add indent to AST representation 
 # TODO : In range and Is smthg 
 # TODO : Display AST 
 class Parser:
@@ -61,10 +62,15 @@ class Parser:
         """
         print("factor")
         retour = []
+
+        if self.show_next().type == 'IDENTIFIER' : 
+            retour.append(Node(self.accept_it()))
+            return 
+            
         if self.show_next().type in Parser.FACTOR_TYPE :
             retour.append(Node(self.accept_it()))
-            pass
-       
+            return 
+        
         elif self.show_next().type == 'LPAREN':
             retour.append(Node(self.accept_it()))
             retour.append(self.expression())
@@ -79,9 +85,12 @@ class Parser:
         term = factor {("*"|"/") factor}
         
         """
-        print("term")
+        print("term") 
         retour = []
+        
         retour.append(self.factor())
+
+
         while self.show_next().type in Parser.TERM_OP:
             print("enter while")
             retour.append(Node(self.accept_it()))
