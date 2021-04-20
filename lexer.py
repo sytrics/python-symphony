@@ -102,9 +102,9 @@ def tokenPrint(Tokens) :
         print(token)
 
         
-
-inputText = open("test.py").readlines()
-Tokens  = Lexer(inputText)
-tokenPrint(Tokens)
-# FileReWritting(inputText)
+if __name__ == '__main__':
+    inputText = open("test.py").readlines()
+    Tokens  = Lexer(inputText)
+    tokenPrint(Tokens)
+    # FileReWritting(inputText)
 

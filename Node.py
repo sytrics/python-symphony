@@ -3,11 +3,6 @@ class Node:
         self.token = token
         self.children = []  # a list of my children
     
-    def add(self, token):
-        """
-        make a node out of a token and add it to self.children
-        """
-        self.addNode(  Node(token) )
         
     def addNode(self, node):
         """
@@ -15,13 +10,13 @@ class Node:
         """
         self.children.append(node)
         
-    def toString(self, node):
-        """
-        displaying node tree (ast if the node is root)
-        """
+    def printTree(self, _prefix="", _last=True):
 
-    def __str__(self) : 
+        print(_prefix, "`- " if _last else "|- ", self.token.type, sep="")
+        _prefix += "   " if _last else "|  "
         
-        print("node")
-        print(len(self.children))
-        
+        N = len(self.children)
+        for i, child in enumerate(self.children):
+            _last = i == (N - 1)
+            if child is not None:
+                child.printTree(_prefix, _last)

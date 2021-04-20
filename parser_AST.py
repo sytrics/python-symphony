@@ -1,5 +1,6 @@
 import sys
 import lexer
+from lexer import Token
 from Node import Node
 
 # TODO : expect Indent for if while statements 
@@ -17,13 +18,11 @@ class Parser:
     def __init__(self, tokens):  
         self.tokens = tokens[:]
         self.errors = 0
-        self.indent = []
-        
-        
 
     def show_next(self, n=1):
         """
         Permet d'acceder à un token dans la liste des tokens à consommer
+        
         Args:
             n (int, optional): numero du token recherché Defaults to 1.
 
@@ -33,17 +32,19 @@ class Parser:
         try:
             return self.tokens[n - 1]
         except IndexError:
-            print('ERROR: no more tokens left!')
-            sys.exit(1)
+            #print('no more tokens left!')
+            return 
+            
 
     def expect(self, kind):
         """
         Cherche la présence d'un token conformément à la syntaxe python 
+        
         Args:
             kind : type de token attendu 
 
         Returns:
-            appel à accept_it si le token est le bon 
+            retourne et consomme le token si conforme
             syntaxe error sinon 
         """
         actualToken = self.show_next()
@@ -65,6 +66,12 @@ class Parser:
                 sys.exit(1)
 
     def accept_it(self) :
+        """
+        Consomme un token et le retourne 
+
+        Returns:
+            token: token consommé 
+        """
         return self.tokens.pop(0)
 
     
@@ -78,7 +85,7 @@ class Parser:
         Returns:
             n : Noeud de l'AST représentant le facteur 
         """
-        print("factor")
+        #print("factor")
         retour = []
 
         if self.show_next().type == 'IDENTIFIER' : 
@@ -99,7 +106,7 @@ class Parser:
             print('Error at {}: expected {}, got {} instead'.format(str(actualPosition),"Identifier | number | (expression)", self.show_next().type))
             sys.exit(1)
         
-        n = Node()
+        n = Node(Token("factor","factor"))
         for e in retour:
             n.addNode(e)
         return n
@@ -113,20 +120,20 @@ class Parser:
         Returns:
             n : Noeud de l'AST représentant le terme
         """
-        print("term") 
+        #print("term") 
         retour = []
         
         retour.append(self.factor())
-
-
-        while self.show_next().type in Parser.TERM_OP:
-            print("enter while")
-            retour.append(Node(self.accept_it()))
-            retour.append(self.factor())
+        if self.show_next() is not None :
+            while self.show_next().type in Parser.TERM_OP:
+                retour.append(Node(self.accept_it()))
+                retour.append(self.factor())
         
-        n = Node()
+        n = Node(Token("term","term"))
         for e in retour:
-            n.addNode(e)
+            if e is not None : 
+                n.addNode(e)
+
         return n
 
     #--------------------------------------------------
@@ -138,16 +145,17 @@ class Parser:
         Returns:
             n : Noeud de l'AST représentant le terme
         """
-        print("expression")
+        #print("expression")
         retour = []
         if self.show_next().type in Parser.ADD_OP:
             retour.append(Node(self.accept_it()))
         retour.append(self.term())
-        while self.show_next().type in Parser.ADD_OP:
-            retour.append(Node(self.accept_it()))
-            retour.append(self.term())
+        if self.show_next() is not None :
+            while self.show_next().type in Parser.ADD_OP:
+                retour.append(Node(self.accept_it()))
+                retour.append(self.term())
 
-        n = Node()
+        n = Node(Token("expression","expression"))
         for e in retour:
             n.addNode(e)
         return n
@@ -166,7 +174,7 @@ class Parser:
         Returns:
             n : Noeud de l'AST représentant le terme
         """
-        print("condition")
+        #print("condition")
         retour = []
         self.expression()
         if (self.show_next().type in Parser.REL_OP):
@@ -182,7 +190,7 @@ class Parser:
             print("condition: found invalid operator ")
             sys.exit(1) 
         
-        n = Node()
+        n = Node(Token("condition","condition"))
         for e in retour:
             n.addNode(e)
         return n
@@ -192,6 +200,7 @@ class Parser:
     def statement(self):
         """
         Permet de parser les statements 
+        
         statement =
             [IDENTIFIER "=" expression
             | "if" condition "then" statement
@@ -201,12 +210,14 @@ class Parser:
         Returns:
             n : Noeud de l'AST représentant le terme
         """
-        print("statement")
+        #print("statement")
         retour = []
+        
         if self.show_next().type == 'IDENTIFIER':
             retour.append(Node(self.accept_it()))
             retour.append(Node(self.expect('EQ')))
             retour.append(self.expression())
+            
 
 
         elif self.show_next().type == 'IF':
@@ -222,7 +233,7 @@ class Parser:
             retour.append(self.statement())
 
         
-        n = Node()
+        n = Node(Token("statement","statement"))
         for e in retour:
             n.addNode(e)
         return n
@@ -233,12 +244,14 @@ class Parser:
     def parse(self):
         """
         Permet le parsing du programme en entier (pas d'entrée vers main)
+        
         Returns:
             n : Noeud de l'AST représentant le programme (root)
         """
-        AST = Node()
+        AST = Node(Token("root", "root"))
         while len(self.tokens) > 0 : 
             AST.addNode(self.statement())
+            
         print("success : program is compiled")
         return AST
 

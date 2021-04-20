@@ -5,6 +5,8 @@ from lexer import Lexer, tokenPrint
 from parser_AST import Parser
 
 
+
+
 if __name__ == '__main__':
 
     # adding test file name as command line argument
@@ -33,5 +35,6 @@ if __name__ == '__main__':
     inputText = open("test.py").readlines()
     Tokens  = Lexer(inputText)
     parser = Parser(Tokens)
-    parser.parse()
-    tokenPrint(parser.tokens)
+    AST = parser.parse()
+    AST.printTree()
+    
