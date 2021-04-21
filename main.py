@@ -3,6 +3,7 @@ import argparse
 import lexer
 from lexer import Lexer, tokenPrint
 from parser_AST import Parser
+from Visitor import Visitor
 
 
 
@@ -37,4 +38,6 @@ if __name__ == '__main__':
     parser = Parser(Tokens)
     AST = parser.parse()
     AST.printTree()
-    
+    visiteur = Visitor()
+    visiteur.visitRoot(AST)
+    visiteur.prettyprint()

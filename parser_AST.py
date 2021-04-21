@@ -1,7 +1,7 @@
 import sys
 import lexer
 from lexer import Token
-from Node import Node
+from Node import *
 
 # TODO : expect Indent for if while statements 
 # TODO : add indent to AST representation 
@@ -90,11 +90,15 @@ class Parser:
 
         if self.show_next().type == 'IDENTIFIER' : 
             retour.append(Node(self.accept_it()))
-            return 
+            n = FactorNode()
+            n.addNode(retour[0])
+            return n
             
         if self.show_next().type in Parser.FACTOR_TYPE :
             retour.append(Node(self.accept_it()))
-            return 
+            n = FactorNode()
+            n.addNode(retour[0])
+            return n 
         
         elif self.show_next().type == 'LPAREN':
             retour.append(Node(self.accept_it()))
@@ -106,7 +110,7 @@ class Parser:
             print('Error at {}: expected {}, got {} instead'.format(str(actualPosition),"Identifier | number | (expression)", self.show_next().type))
             sys.exit(1)
         
-        n = Node(Token("factor","factor"))
+        n = FactorNode()
         for e in retour:
             n.addNode(e)
         return n
@@ -129,11 +133,10 @@ class Parser:
                 retour.append(Node(self.accept_it()))
                 retour.append(self.factor())
         
-        n = Node(Token("term","term"))
+        n = TermNode()
         for e in retour:
             if e is not None : 
                 n.addNode(e)
-
         return n
 
     #--------------------------------------------------
@@ -155,7 +158,7 @@ class Parser:
                 retour.append(Node(self.accept_it()))
                 retour.append(self.term())
 
-        n = Node(Token("expression","expression"))
+        n = ExpressionNode()
         for e in retour:
             n.addNode(e)
         return n
@@ -190,7 +193,7 @@ class Parser:
             print("condition: found invalid operator ")
             sys.exit(1) 
         
-        n = Node(Token("condition","condition"))
+        n = ConditionNode()
         for e in retour:
             n.addNode(e)
         return n
@@ -233,7 +236,7 @@ class Parser:
             retour.append(self.statement())
 
         
-        n = Node(Token("statement","statement"))
+        n = StatementNode()
         for e in retour:
             n.addNode(e)
         return n
@@ -248,7 +251,7 @@ class Parser:
         Returns:
             n : Noeud de l'AST représentant le programme (root)
         """
-        AST = Node(Token("root", "root"))
+        AST = RootNode()
         while len(self.tokens) > 0 : 
             AST.addNode(self.statement())
             
