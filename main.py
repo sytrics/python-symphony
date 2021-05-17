@@ -35,6 +35,7 @@ if __name__ == '__main__':
 
     inputText = open("test.py").readlines()
     Tokens  = Lexer(inputText)
+    tokenPrint(Tokens)
     parser = Parser(Tokens)
     AST = parser.parse()
     AST.printTree()

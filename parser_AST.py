@@ -4,13 +4,12 @@ from lexer import Token
 from Node import *
 
 # TODO : expect Indent for if while statements 
-# TODO : add indent to AST representation 
 # TODO : In range and Is smthg 
 # TODO : Display AST 
 class Parser:
 
     ADD_OP = ['ADD', 'SUB']
-    REL_OP = ['EQ', 'NEQ', 'INF', 'INFEQ', 'SUP', 'SUPEQ']
+    REL_OP = ['EQ', 'DIFF', 'INF', 'SUP']
     TERM_OP = ['MULT', 'DIV']
     FACTOR_TYPE = ['INT', 'FLOAT']
 
@@ -179,9 +178,11 @@ class Parser:
         """
         #print("condition")
         retour = []
-        self.expression()
+        retour.append(self.expression())
         if (self.show_next().type in Parser.REL_OP):
             retour.append(Node(self.accept_it()))
+            if self.show_next().type in Parser.REL_OP : 
+                retour.append(Node(self.accept_it()))
             retour.append(self.expression())
         elif self.show_next().type == 'IN' : 
             pass 
@@ -215,28 +216,50 @@ class Parser:
         """
         #print("statement")
         retour = []
-        
+        n = StatementNode()
         if self.show_next().type == 'IDENTIFIER':
             retour.append(Node(self.accept_it()))
             retour.append(Node(self.expect('EQ')))
             retour.append(self.expression())
             
 
-
         elif self.show_next().type == 'IF':
+            retour.append(Node(self.accept_it()))
             retour.append(self.condition())
             retour.append(Node(self.expect('COLON')))
-        
-            retour.append(self.statement())
-            #ajouter else elseif
+            while self.show_next().type == 'TAB' : 
+                retour.append(Node(self.accept_it()))
+                retour.append(self.statement())
+            #endif
+
+        elif self.show_next().type == 'ELSEIF':
+            retour.append(Node(self.accept_it()))
+            retour.append(self.condition())
+            retour.append(Node(self.expect('COLON')))
+            while self.show_next().type == 'TAB' : 
+                retour.append(Node(self.accept_it()))
+                retour.append(self.statement())
+
+
+        elif self.show_next().type == 'ELSE':
+            retour.append(Node(self.accept_it()))
+            retour.append(Node(self.expect('COLON')))
+            while self.show_next().type == 'TAB' : 
+                retour.append(Node(self.accept_it()))
+                retour.append(self.statement())
+
 
         elif self.show_next().type == 'WHILE':
+            retour.append(Node(self.accept_it()))
             retour.append(self.condition())
             retour.append(Node(self.expect('COLON')))
             retour.append(self.statement())
 
-        
-        n = StatementNode()
+        """ elif self.show_next().type == 'EOL' :
+            retour.append(Node(self.accept_it()))
+            n.addNode(retour[0])
+            return n 
+        """
         for e in retour:
             n.addNode(e)
         return n
@@ -254,7 +277,7 @@ class Parser:
         AST = RootNode()
         while len(self.tokens) > 0 : 
             AST.addNode(self.statement())
-            
+                
         print("success : program is compiled")
         return AST
 
