@@ -13,8 +13,10 @@ class Node:
         self.children.append(node)
         
     def printTree(self, _prefix="", _last=True):
-
-        print(_prefix, "`- " if _last else "|- ", self.token.type, sep="")
+        bitstream = self.token.type 
+        if self.token.type in ('IDENTIFIER','INT','FLOAT') : 
+            bitstream += " => " + self.token.valeur
+        print(_prefix, "`- " if _last else "|- ",bitstream, sep="")
         _prefix += "   " if _last else "|  "
         
         N = len(self.children)

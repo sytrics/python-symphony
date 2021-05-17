@@ -3,9 +3,7 @@ import lexer
 from lexer import Token
 from Node import *
 
-# TODO : expect Indent for if while statements 
 # TODO : In range and Is smthg 
-# TODO : Display AST 
 class Parser:
 
     ADD_OP = ['ADD', 'SUB']
@@ -23,7 +21,7 @@ class Parser:
         Permet d'acceder à un token dans la liste des tokens à consommer
         
         Args:
-            n (int, optional): numero du token recherché Defaults to 1.
+            n (int, optional): numero du token recherché, 1 par défaut.
 
         Returns:
             token : le token demandé
@@ -79,7 +77,7 @@ class Parser:
     def factor(self):
         """
         Permet de parser les facteurs
-        factor = IDENTIFIER | NUMBER | "(" expression ")"
+        factor = IDENTIFIER | NUMBER | expression 
         
         Returns:
             n : Noeud de l'AST représentant le facteur 
@@ -99,15 +97,9 @@ class Parser:
             n.addNode(retour[0])
             return n 
         
-        elif self.show_next().type == 'LPAREN':
-            retour.append(Node(self.accept_it()))
+        else : 
             retour.append(self.expression())
-            retour.append(Node(self.expect('RPAREN')))
-        else:
-            print("syntax error")
-            actualPosition = (self.show_next().ligne, self.show_next().position_debut,self.show_next().position_fin)
-            print('Error at {}: expected {}, got {} instead'.format(str(actualPosition),"Identifier | number | (expression)", self.show_next().type))
-            sys.exit(1)
+        
         
         n = FactorNode()
         for e in retour:
@@ -142,7 +134,7 @@ class Parser:
     def expression(self):
         """
         Permet de parser les expressions (combinaison linéaire de termes)
-        expression = ["+"|"-"] term {("+"|"-") term}
+        expression = ["+"|"-"] terme {("+"|"-") terme}
         
         Returns:
             n : Noeud de l'AST représentant le terme
@@ -168,10 +160,9 @@ class Parser:
         Permet de parser une condition (relation entre 2 expression)
 
         condition =
-            "odd" expression
             | expression ("="|"#"|"<"|"<="|">"|">=") expression
             | in range () 
-            | in ... 
+            | is ... 
         
         Returns:
             n : Noeud de l'AST représentant le terme
@@ -207,8 +198,8 @@ class Parser:
         
         statement =
             [IDENTIFIER "=" expression
-            | "if" condition "then" statement
-            | "while" condition "do" statement
+            | "if" condition : statement
+            | "while" condition : statement
             ]
 
         Returns:
@@ -232,7 +223,7 @@ class Parser:
                 retour.append(self.statement())
             #endif
 
-        elif self.show_next().type == 'ELSEIF':
+        elif self.show_next().type == 'ELIF':
             retour.append(Node(self.accept_it()))
             retour.append(self.condition())
             retour.append(Node(self.expect('COLON')))
@@ -253,13 +244,10 @@ class Parser:
             retour.append(Node(self.accept_it()))
             retour.append(self.condition())
             retour.append(Node(self.expect('COLON')))
-            retour.append(self.statement())
-
-        """ elif self.show_next().type == 'EOL' :
-            retour.append(Node(self.accept_it()))
-            n.addNode(retour[0])
-            return n 
-        """
+            while self.show_next().type == 'TAB' : 
+                retour.append(Node(self.accept_it()))
+                retour.append(self.statement())
+            
         for e in retour:
             n.addNode(e)
         return n

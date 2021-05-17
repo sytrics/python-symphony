@@ -18,7 +18,7 @@ regexExpressions = [
     (r"\s\s\s\s", 'TAB'),
     (r"\b(for)\b", 'FOR'),
     (r"\b(if)\b", 'IF'),
-    (r"\b(elseif)\b", 'ELSEIF'),
+    (r"\b(elif)\b", 'ELIF'),
     (r"\b(else)\b", 'ELSE'),
     (r"\b(while)\b", 'WHILE'),
     (r"\b(return)\b", 'RETURN'),
@@ -43,8 +43,8 @@ regexExpressions = [
     (r"\;", 'SEMICOLON'),
     (r"\:", 'COLON'),
     (r"\,", 'COMMA'),
-    (r"[+-]?[0-9]+(.[0-9]+)", 'FLOAT'),
-    (r"[+-]?[0-9]+", 'INT'),
+    #(r"[+-]?[0-9]+(.[0-9]+)", 'FLOAT'), je n'ai pas réussi à différencier int & float (exclure les int des flottants nottament)
+    (r"[+-]?[0-9]+", 'INT'), 
     (r"\b(\w)+\b", 'IDENTIFIER'),
     #(r"\n", 'EOL')
     ]
