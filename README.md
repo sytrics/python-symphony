@@ -14,7 +14,11 @@ le visiteur permettant la création d'un fichier midi marche mais est en WIP.
 
 ## Usage : 
 
-Executer la commande `python3 main.py -h` affiche l'aide suivante : 
+dépendances : 
+
+`pip install midiutils` 
+
+Exécuter la commande `python3 main.py -h` affiche l'aide suivante : 
 
 ```bash
 usage: main.py [-h] [--compiler COMPILER] [--verbose VERBOSE] input output
@@ -99,4 +103,35 @@ Tout ce qui ne figure pas dans le test est considéré comme non implémenté, e
 * certains mots clés : in range() , is, return, print
 * les flottants (problème au niveau des regex)
 * la POO 
+
+## Structure 
+
+Voici le déroulé simplifié dans le `main.py`
+
+```python
+inputText = open(args.input).readlines()
+
+Tokens  = Lexer(inputText)
+
+parser = Parser(Tokens)
+AST = parser.parse()
+
+AST.printTree()
+if args.compiler == 'PP' : 
+	visiteur = Prettyprinter(args.verbose)
+elif args.compiler == 'MIDI' : 
+	visiteur = MIDIcompiler(args.verbose)
+    
+visiteur.visitRoot(AST)
+visiteur.compile(args.output)
+
+```
+
+Quelques remarques : 
+
+- la classe visiteur définit un visiteur selon le pattern eponyme 
+- les classes Prettyprinter et MIDIcompiler sont des visiteurs (défini par l'héritage)
+- Le lexer se charge de Tokeniser le code afin d'en extraire les unités syntaxiques 
+- le parser lui va déterminer la hierarchie entre ces unités syntaxiques et les ranger dans un arbre syntaxique (AST) 
+- printtTree() est une méode permettant l'affiche de l'AST directement dans le terminal avec les indentations
 
